@@ -68,4 +68,10 @@ begin
         end if;
     end process;
 
+    enable_stimulus : process
+    begin
+        wait for 16 * (CLK_PERIOD/2);
+        sig_enable <= not sig_enable;
+    end process;
+
 end architecture;
