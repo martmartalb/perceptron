@@ -30,8 +30,12 @@ begin
 
     process (clk) is
     begin
-        if (rising_edge(clk) and enable = '1') then
-            dout <= signed(MLP_Bias(0));
+        if rising_edge(clk) then
+        	if enable = '1' then
+            	dout <= signed(MLP_Bias(0));
+            else
+            	dout <= (others => 'Z'); 
+            end if;
         end if;
     end process;
 
