@@ -4,12 +4,13 @@ use IEEE.numeric_std.all;
 
 entity Adder is
     generic (
-        n_bits_in : natural := 8
+        nbits_in : natural := 8;
+        nbits_out : natural := 9
     );
     port (
-        in1  : in signed (n_bits_in - 1 downto 0);
-        in2  : in signed (n_bits_in - 1 downto 0);
-        dout : out signed (n_bits_in downto 0)
+        in1  : in signed (nbits_in - 1 downto 0);
+        in2  : in signed (nbits_in - 1 downto 0);
+        dout : out signed (nbits_out - 1 downto 0)
     );
 end Adder;
 
@@ -17,6 +18,6 @@ architecture Behavioral of Adder is
 
 begin
 
-    dout <= resize(in1, n_bits_in + 1) + resize(in2, n_bits_in + 1);
+    dout <= resize(in1, nbits_out) + resize(in2, nbits_out);
 
 end Behavioral;
