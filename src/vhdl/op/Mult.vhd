@@ -4,12 +4,13 @@ use IEEE.NUMERIC_STD.all;
 
 entity Mult is
     generic (
-        n_bits_in : natural := 4
+        nbits_in  : natural := 4;
+        nbits_out : natural := nbits_in * 2
     );
     port (
-        in1  : in signed (n_bits_in - 1 downto 0);
-        in2  : in signed (n_bits_in - 1 downto 0);
-        dout : out signed (n_bits_in * 2 - 1 downto 0)
+        in1  : in signed (nbits_in - 1 downto 0);
+        in2  : in signed (nbits_in - 1 downto 0);
+        dout : out signed (nbits_out - 1 downto 0)
     );
 end Mult;
 
@@ -17,6 +18,6 @@ architecture Behavioral of Mult is
 
 begin
 
-    dout <= in1 * in2;
+    dout <= resize(in1 * in2, nbits_out);
 
 end Behavioral;

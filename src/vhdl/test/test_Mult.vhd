@@ -13,30 +13,33 @@ architecture arch of test_Mult is
     -- COMPONENT
     component Mult
         generic (
-            n_bits_in : natural := 8
+            nbits_in  : natural := 4;
+            nbits_out : natural := nbits_in * 2
         );
         port (
-            in1  : in signed (n_bits_in - 1 downto 0);
-            in2  : in signed (n_bits_in - 1 downto 0);
-            dout : out signed (n_bits_in * 2 - 1 downto 0)
+            in1  : in signed (nbits_in - 1 downto 0);
+            in2  : in signed (nbits_in - 1 downto 0);
+            dout : out signed (nbits_out - 1 downto 0)
         );
     end component;
 
     -- CONSTANTS
     constant CLK_FREQ   : integer := 100000000; -- 100Mhz
     constant CLK_PERIOD : time    := (real(1E9)/real(CLK_FREQ)) * 1 ns;
-    constant N_BITS_IN  : natural := 4;
+    constant NBITS_IN   : natural := 4;
+    constant NBITS_OUT  : natural := 8;
 
     -- SIGNALS
-    signal sig_in1  : signed(N_BITS_IN - 1 downto 0) := "1010";
-    signal sig_in2  : signed(N_BITS_IN - 1 downto 0) := (others => '0');
-    signal sig_dout : signed(N_BITS_IN * 2 - 1 downto 0);
+    signal sig_in1  : signed(NBITS_IN - 1 downto 0) := "1000";
+    signal sig_in2  : signed(NBITS_IN - 1 downto 0) := (others => '0');
+    signal sig_dout : signed(NBITS_OUT - 1 downto 0);
 
 begin
 
     dev_to_test : Mult
     generic map(
-        n_bits_in => N_BITS_IN
+        nbits_in  => NBITS_IN,
+        nbits_out => NBITS_OUT
     )
     port map(
         in1  => sig_in1,
