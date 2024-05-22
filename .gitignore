@@ -157,3 +157,5 @@ Pipfile.lock
 
 # Models
 models/*
+
+vivado_project/*
