@@ -18,9 +18,24 @@
 proc checkRequiredFiles { origin_dir} {
   set status true
   set files [list \
+ "[file normalize "$origin_dir/vivado_project/test_Adder_behav.wcfg"]"\
+ "[file normalize "$origin_dir/vivado_project/vivado_project.srcs/utils_1/imports/synth_1/Weights.dcp"]"\
+  ]
+  foreach ifile $files {
+    if { ![file isfile $ifile] } {
+      puts " Could not find local file $ifile "
+      set status false
+    }
+  }
+
+  set files [list \
+ "[file normalize "$origin_dir/src/vhdl/op/Adder.vhd"]"\
  "[file normalize "$origin_dir/src/vhdl/packages/rom.vhd"]"\
  "[file normalize "$origin_dir/src/vhdl/params/Weights.vhd"]"\
  "[file normalize "$origin_dir/src/python/data/weights.dat"]"\
+ "[file normalize "$origin_dir/src/vhdl/packages/real_to_fixed_pkg.vhd"]"\
+ "[file normalize "$origin_dir/src/vhdl/packages/real_to_fixed_pkg.vhd"]"\
+ "[file normalize "$origin_dir/src/vhdl/test/test_Adder.vhd"]"\
  "[file normalize "$origin_dir/src/vhdl/packages/rom.vhd"]"\
  "[file normalize "$origin_dir/src/vhdl/test/test_Weights.vhd"]"\
   ]
@@ -149,32 +164,30 @@ set_property -name "simulator.xsim_gcc_version" -value "9.3.0" -objects $obj
 set_property -name "simulator.xsim_version" -value "2023.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "1" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "20" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
   create_fileset -srcset sources_1
 }
 
-# Set IP repository paths
-set obj [get_filesets sources_1]
-if { $obj != {} } {
-   set_property "ip_repo_paths" "" $obj
-
-   # Rebuild user ip_repo's index before adding any source files
-   update_ip_catalog -rebuild
-}
-
 # Set 'sources_1' fileset object
 set obj [get_filesets sources_1]
 set files [list \
+ [file normalize "${origin_dir}/src/vhdl/op/Adder.vhd"] \
  [file normalize "${origin_dir}/src/vhdl/packages/rom.vhd"] \
  [file normalize "${origin_dir}/src/vhdl/params/Weights.vhd"] \
  [file normalize "${origin_dir}/src/python/data/weights.dat"] \
+ [file normalize "${origin_dir}/src/vhdl/packages/real_to_fixed_pkg.vhd"] \
 ]
 add_files -norecurse -fileset $obj $files
 
 # Set 'sources_1' fileset file properties for remote files
+set file "$origin_dir/src/vhdl/op/Adder.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+
 set file "$origin_dir/src/vhdl/packages/rom.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -191,6 +204,12 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "Data Files" -objects $file_obj
 
+set file "$origin_dir/src/vhdl/packages/real_to_fixed_pkg.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
+set_property -name "library" -value "perceptron" -objects $file_obj
+
 
 # Set 'sources_1' fileset file properties for local files
 # None
@@ -198,7 +217,8 @@ set_property -name "file_type" -value "Data Files" -objects $file_obj
 # Set 'sources_1' fileset properties
 set obj [get_filesets sources_1]
 set_property -name "dataflow_viewer_settings" -value "min_width=16" -objects $obj
-set_property -name "top" -value "Weights" -objects $obj
+set_property -name "top" -value "Adder" -objects $obj
+set_property -name "top_auto_set" -value "0" -objects $obj
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
@@ -221,12 +241,31 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 # Set 'sim_1' fileset object
 set obj [get_filesets sim_1]
 set files [list \
+ [file normalize "${origin_dir}/src/vhdl/packages/real_to_fixed_pkg.vhd"] \
+ [file normalize "${origin_dir}/src/vhdl/test/test_Adder.vhd"] \
  [file normalize "${origin_dir}/src/vhdl/packages/rom.vhd"] \
  [file normalize "${origin_dir}/src/vhdl/test/test_Weights.vhd"] \
 ]
 add_files -norecurse -fileset $obj $files
 
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/vivado_project/test_Adder_behav.wcfg" ]\
+]
+set added_files [add_files -fileset sim_1 $files]
+
 # Set 'sim_1' fileset file properties for remote files
+set file "$origin_dir/src/vhdl/packages/real_to_fixed_pkg.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "perceptron" -objects $file_obj
+
+set file "$origin_dir/src/vhdl/test/test_Adder.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+
 set file "$origin_dir/src/vhdl/packages/rom.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
@@ -244,12 +283,27 @@ set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
 
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
-set_property -name "top" -value "test_Weights" -objects $obj
+set_property -name "top" -value "test_Adder" -objects $obj
+set_property -name "top_auto_set" -value "0" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
+set_property -name "xsim.simulate.runtime" -value "10us" -objects $obj
 
 # Set 'utils_1' fileset object
 set obj [get_filesets utils_1]
-# Empty (no sources present)
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/vivado_project/vivado_project.srcs/utils_1/imports/synth_1/Weights.dcp" ]\
+]
+set added_files [add_files -fileset utils_1 $files]
+
+# Set 'utils_1' fileset file properties for remote files
+# None
+
+# Set 'utils_1' fileset file properties for local files
+set file "synth_1/Weights.dcp"
+set file_obj [get_files -of_objects [get_filesets utils_1] [list "*$file"]]
+set_property -name "netlist_only" -value "0" -objects $file_obj
+
 
 # Set 'utils_1' fileset properties
 set obj [get_filesets utils_1]
@@ -280,6 +334,8 @@ if { $obj != "" } {
 
 }
 set obj [get_runs synth_1]
+set_property -name "needs_refresh" -value "1" -objects $obj
+set_property -name "incremental_checkpoint" -value "$proj_dir/vivado_project.srcs/utils_1/imports/synth_1/Weights.dcp" -objects $obj
 set_property -name "auto_incremental_checkpoint" -value "1" -objects $obj
 set_property -name "strategy" -value "Vivado Synthesis Defaults" -objects $obj
 

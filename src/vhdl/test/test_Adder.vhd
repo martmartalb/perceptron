@@ -1,56 +1,68 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+USE ieee.math_real.ALL;
 
-entity test_Adder is
+LIBRARY perceptron;
+USE perceptron.real_to_fixed_pkg.ALL;
+
+ENTITY test_Adder IS
     -- port (
     --     clock
     -- );
-end test_Adder;
+END test_Adder;
 
-architecture arch of test_Adder is
+ARCHITECTURE arch OF test_Adder IS
 
     -- COMPONENT
-    component Adder
-        generic (
-            nbits_in : natural := 8;
-            nbits_out : natural := 9
+    COMPONENT Adder
+        GENERIC (
+            nbits_in : NATURAL := 8
         );
-        port (
-            in1  : in signed (nbits_in - 1 downto 0);
-            in2  : in signed (nbits_in - 1 downto 0);
-            dout : out signed (nbits_out - 1 downto 0)
+        PORT (
+            in1 : IN STD_LOGIC_VECTOR (nbits_in - 1 DOWNTO 0);
+            in2 : IN STD_LOGIC_VECTOR (nbits_in - 1 DOWNTO 0);
+            dout : OUT STD_LOGIC_VECTOR (nbits_in DOWNTO 0)
         );
-    end component;
+    END COMPONENT;
 
     -- CONSTANTS
-    constant CLK_FREQ   : integer := 100000000; -- 100Mhz
-    constant CLK_PERIOD : time    := (real(1E9)/real(CLK_FREQ)) * 1 ns;
-    constant N_BITS_IN  : natural := 4;
-    constant N_BITS_OUT  : natural := 4;
+    CONSTANT CLK_FREQ : INTEGER := 100000000; -- 100Mhz
+    CONSTANT CLK_PERIOD : TIME := (real(1E9)/real(CLK_FREQ)) * 1 ns;
+    CONSTANT N_BITS_IN : NATURAL := 8;
+    CONSTANT N_FRANCTIONAL_PART : NATURAL := 4;
 
     -- SIGNALS
-    signal sig_in1  : signed(N_BITS_IN - 1 downto 0) := "1010";
-    signal sig_in2  : signed(N_BITS_IN - 1 downto 0) := (others => '0');
-    signal sig_dout : signed(N_BITS_OUT - 1 downto 0);
+    SIGNAL in1 : STD_LOGIC_VECTOR(N_BITS_IN - 1 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL in2 : STD_LOGIC_VECTOR(N_BITS_IN - 1 DOWNTO 0) := "10110000";
+    SIGNAL dout : STD_LOGIC_VECTOR(N_BITS_IN DOWNTO 0);
 
-begin
+    SIGNAL real_in1 : real := 0.0;
+    SIGNAL real_int2 : real := 0.0;
+    SIGNAL real_dount : real;
+    SIGNAL delta_in1 : real := 1.1;
+
+BEGIN
 
     dev_to_test : Adder
-    generic map(
-        nbits_in => N_BITS_IN,
-        nbits_out => N_BITS_OUT
+    GENERIC MAP(
+        nbits_in => N_BITS_IN
     )
-    port map(
-        in1  => sig_in1,
-        in2  => sig_in2,
-        dout => sig_dout
+    PORT MAP(
+        in1 => in1,
+        in2 => in2,
+        dout => dout
     );
 
-    sig_in1_stimulus : process
-    begin
-        wait for CLK_PERIOD/2;
-        sig_in2 <= sig_in2 + 1;
-    end process;
+    real_in1 <= to_real(to_integer(signed(in1)), N_FRANCTIONAL_PART);
+    real_int2 <= to_real(to_integer(signed(in2)), N_FRANCTIONAL_PART);
+    real_dount <= to_real(to_integer(signed(dout)), N_FRANCTIONAL_PART);
 
-end architecture;
+    sig_in1_stimulus : PROCESS
+    BEGIN
+        WAIT FOR CLK_PERIOD/2;
+        in1 <= STD_LOGIC_VECTOR(to_signed(to_integer(signed(in1)) + to_fixed(delta_in1, N_FRANCTIONAL_PART), in1'LENGTH));
+
+    END PROCESS;
+
+END ARCHITECTURE;

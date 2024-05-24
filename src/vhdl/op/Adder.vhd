@@ -1,23 +1,27 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity Adder is
-    generic (
-        nbits_in : natural := 8;
-        nbits_out : natural := 9
+ENTITY Adder IS
+    GENERIC (
+        nbits_in : NATURAL := 8
     );
-    port (
-        in1  : in signed (nbits_in - 1 downto 0);
-        in2  : in signed (nbits_in - 1 downto 0);
-        dout : out signed (nbits_out - 1 downto 0)
+    PORT (
+        in1 : IN STD_LOGIC_VECTOR (nbits_in - 1 DOWNTO 0);
+        in2 : IN STD_LOGIC_VECTOR (nbits_in - 1 DOWNTO 0);
+        dout : OUT STD_LOGIC_VECTOR (nbits_in DOWNTO 0)
     );
-end Adder;
+END Adder;
 
-architecture Behavioral of Adder is
+ARCHITECTURE Behavioral OF Adder IS
 
-begin
+    SIGNAL tmp_in1, tmp_in2, tmp_dout : signed(nbits_in DOWNTO 0);
 
-    dout <= resize(in1, nbits_out) + resize(in2, nbits_out);
+BEGIN
 
-end Behavioral;
+    tmp_in1 <= resize(signed(in1), nbits_in + 1);
+    tmp_in2 <= resize(signed(in2), nbits_in + 1);
+    tmp_dout <= tmp_in1 + tmp_in2;
+    dout <= STD_LOGIC_VECTOR(tmp_dout);
+
+END Behavioral;
