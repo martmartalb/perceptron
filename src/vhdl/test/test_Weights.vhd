@@ -1,77 +1,77 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-entity test_Weights is
+ENTITY test_Weights IS
     -- port ();
-end test_Weights;
+END test_Weights;
 
-architecture arch of test_Weights is
+ARCHITECTURE arch OF test_Weights IS
 
     -- COMPONENTS
-    component Weights
-        generic (
-            nbits_weights   : natural := 3;
-            layer           : natural := 1;
-            neuron          : integer := 0;
-            size_prev_layer : natural := 100
+    COMPONENT Weights
+        GENERIC (
+            nbits_weights : NATURAL := 3;
+            layer : NATURAL := 1;
+            neuron : INTEGER := 0;
+            size_prev_layer : NATURAL := 100
         );
-        port (
-            clk        : in std_logic;
-            enable     : in std_logic;
-            weight_idx : in integer range 0 to size_prev_layer - 1;
-            dout       : out signed (nbits_weights - 1 downto 0)
+        PORT (
+            clk : IN STD_LOGIC;
+            enable : IN STD_LOGIC;
+            weight_idx : IN INTEGER RANGE 0 TO size_prev_layer - 1;
+            dout : OUT signed (nbits_weights - 1 DOWNTO 0)
         );
-    end component;
+    END COMPONENT;
 
     -- CONSTANTS
-    constant CLK_FREQ        : integer := 100000000; -- 100Mhz
-    constant CLK_PERIOD      : time    := (real(1E9)/real(CLK_FREQ)) * 1 ns;
-    constant SIZE_PREV_LAYER : natural := 4;
-    constant DATA_LENGTH     : natural := 4;
+    CONSTANT CLK_FREQ : INTEGER := 100000000; -- 100Mhz
+    CONSTANT CLK_PERIOD : TIME := (real(1E9)/real(CLK_FREQ)) * 1 ns;
+    CONSTANT SIZE_PREV_LAYER : NATURAL := 4;
+    CONSTANT DATA_LENGTH : NATURAL := 4;
 
     -- SIGNALS
-    signal sig_clk         : std_logic                              := '0';
-    signal sig_enable      : std_logic                              := '1';
-    signal sig_weights_idx : integer range 0 to size_prev_layer - 1 := 0;
-    signal sig_dout        : signed(DATA_LENGTH - 1 downto 0);
+    SIGNAL sig_clk : STD_LOGIC := '0';
+    SIGNAL sig_enable : STD_LOGIC := '1';
+    SIGNAL sig_weights_idx : INTEGER RANGE 0 TO size_prev_layer - 1 := 0;
+    SIGNAL sig_dout : signed(DATA_LENGTH - 1 DOWNTO 0);
 
-begin
+BEGIN
 
     dev_to_test : Weights
-    generic map(
-        nbits_weights   => DATA_LENGTH,
-        layer           => 1,
-        neuron          => 0,
+    GENERIC MAP(
+        nbits_weights => DATA_LENGTH,
+        layer => 1,
+        neuron => 0,
         size_prev_layer => SIZE_PREV_LAYER
     )
-    port map(
-        clk        => sig_clk,
-        enable     => sig_enable,
+    PORT MAP(
+        clk => sig_clk,
+        enable => sig_enable,
         weight_idx => sig_weights_idx,
-        dout       => sig_dout
+        dout => sig_dout
     );
 
-    clk_stimulus : process
-    begin
-        wait for CLK_PERIOD/2;
-        sig_clk <= not sig_clk;
-    end process;
+    clk_stimulus : PROCESS
+    BEGIN
+        WAIT FOR CLK_PERIOD/2;
+        sig_clk <= NOT sig_clk;
+    END PROCESS;
 
-    address_increase : process
-    begin
-        wait for 4 * (CLK_PERIOD/2);
-        if sig_weights_idx < size_prev_layer - 1 then
+    address_increase : PROCESS
+    BEGIN
+        WAIT FOR 4 * (CLK_PERIOD/2);
+        IF sig_weights_idx < size_prev_layer - 1 THEN
             sig_weights_idx <= sig_weights_idx + 1;
-        else
+        ELSE
             sig_weights_idx <= 0;
-        end if;
-    end process;
+        END IF;
+    END PROCESS;
 
-    enable_stimulus : process
-    begin
-        wait for 16 * (CLK_PERIOD/2);
-        sig_enable <= not sig_enable;
-    end process;
+    enable_stimulus : PROCESS
+    BEGIN
+        WAIT FOR 16 * (CLK_PERIOD/2);
+        sig_enable <= NOT sig_enable;
+    END PROCESS;
 
-end architecture;
+END ARCHITECTURE;

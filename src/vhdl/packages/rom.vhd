@@ -1,33 +1,33 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-use IEEE.std_logic_textio.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+USE IEEE.std_logic_textio.ALL;
 
-library STD;
-use std.textio.all;
+LIBRARY STD;
+USE std.textio.ALL;
 
-package rom is
+PACKAGE rom IS
 
-	type rom_type is array (natural range <>) of std_logic_vector;
-	impure function read_rom_file(filename : in string; data_length : in natural; rom_size : in natural) return rom_type;
+	TYPE rom_type IS ARRAY (NATURAL RANGE <>) OF STD_LOGIC_VECTOR;
+	IMPURE FUNCTION read_rom_file(filename : IN STRING; data_length : IN NATURAL; rom_size : IN NATURAL) RETURN rom_type;
 
-end package;
+END PACKAGE;
 
-package body rom is
+PACKAGE BODY rom IS
 
-	impure function read_rom_file(filename : in string; data_length : in natural; rom_size : in natural) return rom_type is
-		file rf        : text open read_mode is filename;
-		variable v_l   : line;
-		variable v_i   : bit_vector(data_length - 1 downto 0);
-		variable v_rom : rom_type(0 to (rom_size - 1))((data_length - 1) downto 0);
-	begin
-		for i in 0 to (rom_size - 1) loop
-			assert false report integer'image(data_length) severity NOTE;
+	IMPURE FUNCTION read_rom_file(filename : IN STRING; data_length : IN NATURAL; rom_size : IN NATURAL) RETURN rom_type IS
+		FILE rf : text OPEN read_mode IS filename;
+		VARIABLE v_l : line;
+		VARIABLE v_i : bit_vector(data_length - 1 DOWNTO 0);
+		VARIABLE v_rom : rom_type(0 TO (rom_size - 1))((data_length - 1) DOWNTO 0);
+	BEGIN
+		FOR i IN 0 TO (rom_size - 1) LOOP
+			ASSERT false REPORT INTEGER'image(data_length) SEVERITY NOTE;
 			readline (rf, v_l);
 			read (v_l, v_i);
 			v_rom(i) := to_stdlogicvector(v_i);
-		end loop;
-		return v_rom;
-	end function;
+		END LOOP;
+		RETURN v_rom;
+	END FUNCTION;
 
-end rom;
+END rom;
